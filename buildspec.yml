@@ -1,13 +1,22 @@
 version: 0.2
 
 phases:
-  install:
+  pre_build:
     commands:
-      - echo "Nothing to install"
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
 
   build:
     commands:
-      - echo "Preparing files for deployment"
+      - echo Build started on `date`
+      - docker build -t webapp-linux-container -f WebApp/Dockerfile .
+      - docker tag webapp-linux-container:latest $ECR_REPOSITORY_URI:latest
+
+  post_build:
+    commands:
+      - echo Pushing image to ECR...
+      - docker push $ECR_REPOSITORY_URI:latest
+      - echo Build completed on `date`
 
 artifacts:
   files:
