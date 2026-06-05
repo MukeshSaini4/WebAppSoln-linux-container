@@ -16,8 +16,9 @@ phases:
     commands:
       - echo Pushing image to ECR...
       - docker push $ECR_REPOSITORY_URI:latest
+      - printf '[{"name":"webapp-container","imageUri":"%s"}]' $ECR_REPOSITORY_URI:latest > imagedefinitions.json
       - echo Build completed on `date`
 
 artifacts:
   files:
-    - '**/*'
+    - imagedefinitions.json
